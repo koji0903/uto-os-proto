@@ -13,6 +13,7 @@ interface SpotModalProps {
 export default function SpotModal({ location, onClose, onSuccess }: SpotModalProps) {
     const [file, setFile] = useState<File | null>(null);
     const [description, setDescription] = useState("");
+    const [spotType, setSpotType] = useState<"resource" | "issue">("resource");
     const [loadingStep, setLoadingStep] = useState<string | null>(null);
     const [error, setError] = useState("");
 
@@ -34,7 +35,7 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
 
             // 2. AI Analysis (Server Action)
             setLoadingStep("AIで写真と地域課題を解析中...");
-            const aiResult = await analyzeLocation(base64, description);
+            const aiResult = await analyzeLocation(base64, description, spotType);
 
             // 3. Skip Firebase Storage, use Base64 string directly
             // Firebase Storage requires Blaze plan, so we save small images to Firestore directly as a workaround
@@ -72,6 +73,26 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
 
                 <form onSubmit={handleSubmit} className="p-4 flex flex-col gap-4">
                     {error && <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">{error}</div>}
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">投稿タイプ (必須)</label>
+                        <div className="flex bg-gray-100 p-1 rounded-xl">
+                            <button
+                                type="button"
+                                onClick={() => setSpotType("resource")}
+                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${spotType === "resource" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                            >
+                                地域資源（魅力・歴史など）
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setSpotType("issue")}
+                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${spotType === "issue" ? "bg-white text-red-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                            >
+                                地域課題（危険箇所など）
+                            </button>
+                        </div>
+                    </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">写真 (必須)</label>

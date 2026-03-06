@@ -20,7 +20,7 @@ genAI.getGenerativeModel = function (modelParams: any, requestOptions?: any) {
     return new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "").getGenerativeModel(modelParams, { ...opts, customFetch });
 }
 
-export async function analyzeLocation(base64Image: string, description: string) {
+export async function analyzeLocation(base64Image: string, description: string, spotType: 'resource' | 'issue') {
     if (!process.env.GEMINI_API_KEY) {
         throw new Error("GEMINI_API_KEY is not defined in .env.local");
     }
@@ -33,11 +33,11 @@ export async function analyzeLocation(base64Image: string, description: string) 
 
 【入力情報】
 ユーザーコメント: "${description}"
+指定されたタイプ: ${spotType === 'resource' ? '地域資源（魅力、歴史、グルメなど）' : '地域課題（危険箇所、インフラ異常など）'}
 
 【出力JSONフォーマット】
 {
-  "type": "resource" もしくは "issue", // リソース(資源)か課題かを判定
-  "category": "テキスト", // 歴史、グルメ、風景、危険箇所、インフラ異常 などの具体的なタグを1つ
+  "category": "テキスト", // ${spotType === 'resource' ? '歴史、グルメ、風景' : '危険箇所、インフラ異常'} などの具体的なタグを1つ
   "ai_analysis": "テキスト" // 写真とコメントから読み取れる分析結果、あるいは地域課題の場合は解決に向けたヒントや重要度を簡潔に記載（1〜3文程度）
 }
   `;
@@ -65,10 +65,8 @@ export async function analyzeLocation(base64Image: string, description: string) 
 
         const parsed = JSON.parse(text);
 
-        // Fallback validation
-        if (parsed.type !== "resource" && parsed.type !== "issue") {
-            parsed.type = "resource";
-        }
+        // Explicitly set the type returned back to the UI based on user's choice
+        parsed.type = spotType;
 
         return parsed;
     } catch (error) {
