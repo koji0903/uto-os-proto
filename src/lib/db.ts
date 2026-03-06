@@ -10,6 +10,7 @@ export interface Spot {
     imageUrl: string;
     description: string;
     ai_analysis: string;
+    urgency?: 'high' | 'medium' | 'low';
     createdAt?: number;
 }
 

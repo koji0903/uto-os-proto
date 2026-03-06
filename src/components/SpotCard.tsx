@@ -26,11 +26,20 @@ export default function SpotCard({ spot, onClose, isAdmin, onDelete }: SpotCardP
                 </button>
                 <div className="absolute top-2 left-2 flex gap-2">
                     <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm backdrop-blur-md ${isResource ? "bg-blue-500/90 text-white" : "bg-red-500/90 text-white"
+                        className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm backdrop-blur-md flex-shrink-0 ${isResource ? "bg-blue-500/90 text-white" : "bg-red-500/90 text-white"
                             }`}
                     >
                         {isResource ? "地域資源" : "地域課題"}
                     </span>
+                    {!isResource && spot.urgency && (
+                        <span
+                            className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm backdrop-blur-md flex-shrink-0 text-white ${spot.urgency === "high" ? "bg-red-600 animate-[pulse_1s_ease-in-out_infinite]" :
+                                    spot.urgency === "medium" ? "bg-orange-500/90" : "bg-emerald-500/90"
+                                }`}
+                        >
+                            緊急度: {spot.urgency === "high" ? "高" : spot.urgency === "medium" ? "中" : "低"}
+                        </span>
+                    )}
                     {isAdmin && (
                         <button
                             onClick={onDelete}

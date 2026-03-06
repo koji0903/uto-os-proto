@@ -14,6 +14,7 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
     const [file, setFile] = useState<File | null>(null);
     const [description, setDescription] = useState("");
     const [spotType, setSpotType] = useState<"resource" | "issue">("resource");
+    const [urgency, setUrgency] = useState<"high" | "medium" | "low">("medium");
     const [loadingStep, setLoadingStep] = useState<string | null>(null);
     const [error, setError] = useState("");
 
@@ -45,11 +46,12 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
             setLoadingStep("マップにスポットを登録中...");
             await addSpot({
                 location,
-                type: aiResult.type as "resource" | "issue",
+                type: spotType,
                 category: aiResult.category,
                 imageUrl,
                 description,
                 ai_analysis: aiResult.ai_analysis,
+                ...(spotType === "issue" && { urgency }),
             });
 
             onSuccess();
@@ -93,6 +95,35 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
                             </button>
                         </div>
                     </div>
+
+                    {spotType === "issue" && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">緊急度</label>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setUrgency("high")}
+                                    className={`flex-1 py-2 text-sm font-bold rounded-xl border-2 transition-all ${urgency === "high" ? "bg-red-50 border-red-500 text-red-700" : "border-gray-200 text-gray-500 hover:border-red-200 hover:text-red-500"}`}
+                                >
+                                    高 (High)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setUrgency("medium")}
+                                    className={`flex-1 py-2 text-sm font-bold rounded-xl border-2 transition-all ${urgency === "medium" ? "bg-orange-50 border-orange-500 text-orange-700" : "border-gray-200 text-gray-500 hover:border-orange-200 hover:text-orange-500"}`}
+                                >
+                                    中 (Medium)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setUrgency("low")}
+                                    className={`flex-1 py-2 text-sm font-bold rounded-xl border-2 transition-all ${urgency === "low" ? "bg-emerald-50 border-emerald-500 text-emerald-700" : "border-gray-200 text-gray-500 hover:border-emerald-200 hover:text-emerald-500"}`}
+                                >
+                                    低 (Low)
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">写真 (必須)</label>

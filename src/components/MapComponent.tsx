@@ -59,13 +59,23 @@ const MapComponent = memo(function MapComponent({ spots, filter, centerLocation,
                             key={spot.id}
                             position={spot.location}
                             onClick={() => onMarkerClick(spot)}
+                            className={spot.urgency === "high" ? "animate-[pulse_1s_ease-in-out_infinite]" : ""}
                         >
                             {spot.type === "resource" ? (
                                 // Blue pin for resources (natural/tourist spots)
-                                <Pin background={"#3B82F6"} borderColor={"#1D4ED8"} glyphColor={"#FFFFFF"} />
+                                <Pin
+                                    background={"#3B82F6"}
+                                    borderColor={"#1D4ED8"}
+                                    glyphColor={"#FFFFFF"}
+                                />
                             ) : (
                                 // Red pin for issues (danger/problems)
-                                <Pin background={"#EF4444"} borderColor={"#B91C1C"} glyphColor={"#FFFFFF"} />
+                                <Pin
+                                    background={"#EF4444"}
+                                    borderColor={"#B91C1C"}
+                                    glyphColor={"#FFFFFF"}
+                                    scale={spot.urgency === "high" ? 1.3 : 1}
+                                />
                             )}
                         </AdvancedMarker>
                     ))}
