@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from './firebase';
 
@@ -67,6 +67,16 @@ export async function uploadImage(file: File): Promise<string> {
         return url;
     } catch (error) {
         console.error('Error uploading image: ', error);
+        throw error;
+    }
+}
+
+export async function deleteSpot(id: string) {
+    try {
+        await deleteDoc(doc(db, 'spots', id));
+        console.log("Firestore: Deleted spot", id);
+    } catch (error) {
+        console.error('Error deleting document: ', error);
         throw error;
     }
 }

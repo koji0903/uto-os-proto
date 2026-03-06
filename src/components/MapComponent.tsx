@@ -1,7 +1,7 @@
 "use client";
 
-import React, { memo } from "react";
-import { APIProvider, Map, AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
+import React, { memo, useEffect } from "react";
+import { APIProvider, Map, AdvancedMarker, Pin, useMap } from "@vis.gl/react-google-maps";
 import { Spot } from "@/lib/db";
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
@@ -10,11 +10,24 @@ const UTO_CITY_CENTER = { lat: 32.6945, lng: 130.6640 };
 interface MapComponentProps {
     spots: Spot[];
     filter: "all" | "resource" | "issue";
+    centerLocation?: { lat: number; lng: number };
     onMapClick: (location: { lat: number; lng: number }) => void;
     onMarkerClick: (spot: Spot) => void;
 }
 
-const MapComponent = memo(function MapComponent({ spots, filter, onMapClick, onMarkerClick }: MapComponentProps) {
+// Map Updater Component to handle panning without making the Map strictly controlled
+function MapUpdater({ center }: { center?: { lat: number; lng: number } }) {
+    const map = useMap();
+    useEffect(() => {
+        if (map && center) {
+            map.panTo(center);
+            map.setZoom(16); // Zoom in closer when user gets their location
+        }
+    }, [map, center]);
+    return null;
+}
+
+const MapComponent = memo(function MapComponent({ spots, filter, centerLocation, onMapClick, onMarkerClick }: MapComponentProps) {
     if (!GOOGLE_MAPS_API_KEY) {
         return (
             <div className="flex items-center justify-center w-full h-[600px] bg-red-50 text-red-600 rounded-xl border border-red-200 shadow-sm p-4">
@@ -40,6 +53,7 @@ const MapComponent = memo(function MapComponent({ spots, filter, onMapClick, onM
                         }
                     }}
                 >
+                    <MapUpdater center={centerLocation} />
                     {filteredSpots.map((spot) => (
                         <AdvancedMarker
                             key={spot.id}
