@@ -1,0 +1,127 @@
+import React, { useState } from "react";
+import imageCompression from "browser-image-compression";
+import { X, Upload, Loader2 } from "lucide-react";
+import { uploadImage, addSpot } from "@/lib/db";
+import { analyzeLocation } from "@/app/actions/analyze";
+
+interface SpotModalProps {
+    location: { lat: number; lng: number };
+    onClose: () => void;
+    onSuccess: () => void;
+}
+
+export default function SpotModal({ location, onClose, onSuccess }: SpotModalProps) {
+    const [file, setFile] = useState<File | null>(null);
+    const [description, setDescription] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!file || !description) {
+            setError("写真とコメント（説明文）は必須です。");
+            return;
+        }
+
+        setLoading(true);
+        setError("");
+
+        try {
+            // 1. Image Compression
+            const options = { maxSizeMB: 1, maxWidthOrHeight: 1024, useWebWorker: true };
+            const compressedFile = await imageCompression(file, options);
+            const base64 = await imageCompression.getDataUrlFromFile(compressedFile);
+
+            // 2. AI Analysis (Server Action)
+            const aiResult = await analyzeLocation(base64, description);
+
+            // 3. Upload Image to Firebase Storage
+            const imageUrl = await uploadImage(compressedFile);
+
+            // 4. Save to Firestore
+            await addSpot({
+                location,
+                type: aiResult.type as "resource" | "issue",
+                category: aiResult.category,
+                imageUrl,
+                description,
+                ai_analysis: aiResult.ai_analysis,
+            });
+
+            onSuccess();
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || "投稿中にエラーが発生しました。");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+                <div className="flex items-center justify-between p-4 border-b">
+                    <h2 className="text-lg font-bold text-gray-800">新しいスポットを投稿</h2>
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+                        <X size={20} />
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="p-4 flex flex-col gap-4">
+                    {error && <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">{error}</div>}
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">写真 (必須)</label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors relative">
+                            {file ? (
+                                <div className="text-sm font-medium text-emerald-600 flex items-center gap-2">
+                                    <span className="truncate max-w-[200px]">{file.name}</span>
+                                    <button type="button" onClick={() => setFile(null)} className="text-gray-400 hover:text-red-500">
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <Upload size={24} className="text-gray-400 mb-2" />
+                                    <span className="text-sm text-gray-500">クリックして画像を選択</span>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        onChange={(e) => setFile(e.target.files?.[0] || null)}
+                                    />
+                                </>
+                            )}
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1">写真は自動でリサイズされAI解析されます。</p>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">コメント (必須)</label>
+                        <textarea
+                            className="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all resize-none h-24 text-gray-800"
+                            placeholder="ここが危険！、新しいカフェができました！ など"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="mt-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-sm transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        {loading ? (
+                            <>
+                                <Loader2 size={18} className="animate-spin" />
+                                解析・送信中...
+                            </>
+                        ) : (
+                            "AIに解析させて投稿する"
+                        )}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+}
