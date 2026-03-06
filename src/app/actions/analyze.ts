@@ -2,7 +2,23 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+// サーバーアクションのタイムアウトやAbortionを回避するため、fetchをラップする
+const customFetch = (url: RequestInfo | URL, init?: RequestInit) => {
+    // Next.jsのServerActionが勝手にリクエストをAbortするのを防ぐため、signalを外すか、新しいAbortControllerを渡す
+    const newInit = { ...init };
+    if (newInit.signal) {
+        delete newInit.signal;
+    }
+    return fetch(url, newInit);
+};
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+// customFetchを各モデルに設定してAbortを回避
+genAI.getGenerativeModel = function (modelParams: any, requestOptions?: any) {
+    const opts = requestOptions || {};
+    opts.customHeaders = opts.customHeaders || new Headers();
+    return new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "").getGenerativeModel(modelParams, { ...opts, customFetch });
+}
 
 export async function analyzeLocation(base64Image: string, description: string) {
     if (!process.env.GEMINI_API_KEY) {

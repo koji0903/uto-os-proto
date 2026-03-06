@@ -13,7 +13,7 @@ interface SpotModalProps {
 export default function SpotModal({ location, onClose, onSuccess }: SpotModalProps) {
     const [file, setFile] = useState<File | null>(null);
     const [description, setDescription] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [loadingStep, setLoadingStep] = useState<string | null>(null);
     const [error, setError] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -23,22 +23,25 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
             return;
         }
 
-        setLoading(true);
+        setLoadingStep("画像を準備中...");
         setError("");
 
         try {
-            // 1. Image Compression
-            const options = { maxSizeMB: 1, maxWidthOrHeight: 1024, useWebWorker: true };
+            // 1. Image Compression (Firestore 1MB limit -> target ~300KB)
+            const options = { maxSizeMB: 0.3, maxWidthOrHeight: 800, useWebWorker: true };
             const compressedFile = await imageCompression(file, options);
             const base64 = await imageCompression.getDataUrlFromFile(compressedFile);
 
             // 2. AI Analysis (Server Action)
+            setLoadingStep("AIで写真と地域課題を解析中...");
             const aiResult = await analyzeLocation(base64, description);
 
-            // 3. Upload Image to Firebase Storage
-            const imageUrl = await uploadImage(compressedFile);
+            // 3. Skip Firebase Storage, use Base64 string directly
+            // Firebase Storage requires Blaze plan, so we save small images to Firestore directly as a workaround
+            const imageUrl = base64;
 
             // 4. Save to Firestore
+            setLoadingStep("マップにスポットを登録中...");
             await addSpot({
                 location,
                 type: aiResult.type as "resource" | "issue",
@@ -53,7 +56,7 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
             console.error(err);
             setError(err.message || "投稿中にエラーが発生しました。");
         } finally {
-            setLoading(false);
+            setLoadingStep(null);
         }
     };
 
@@ -108,13 +111,13 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
 
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loadingStep !== null}
                         className="mt-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-sm transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        {loading ? (
+                        {loadingStep ? (
                             <>
                                 <Loader2 size={18} className="animate-spin" />
-                                解析・送信中...
+                                {loadingStep}
                             </>
                         ) : (
                             "AIに解析させて投稿する"

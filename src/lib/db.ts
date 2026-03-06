@@ -15,10 +15,15 @@ export interface Spot {
 
 export async function addSpot(spot: Omit<Spot, 'id' | 'createdAt'>) {
     try {
-        const docRef = await addDoc(collection(db, 'spots'), {
-            ...spot,
-            createdAt: Date.now(),
-        });
+        console.log("Firestore: Saving spot...");
+        const docRef = await Promise.race([
+            addDoc(collection(db, 'spots'), {
+                ...spot,
+                createdAt: Date.now(),
+            }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Firestore timeout (15s). Ensure Firestore Database is created and security rules allow writes.")), 15000))
+        ]) as any;
+        console.log("Firestore: Saved successfully with ID", docRef.id);
         return docRef.id;
     } catch (error) {
         console.error('Error adding document: ', error);
@@ -43,9 +48,23 @@ export async function getSpots(): Promise<Spot[]> {
 
 export async function uploadImage(file: File): Promise<string> {
     try {
+        console.log("Firebase Storage: Starting upload for", file.name);
+        if (!storage) {
+            throw new Error("Storage is not initialized. Check your Firebase config.");
+        }
+
         const fileRef = ref(storage, `images/${Date.now()}_${file.name}`);
-        await uploadBytes(fileRef, file);
-        return await getDownloadURL(fileRef);
+
+        // Wrap with timeout to catch silent hangs (e.g. uninitialized Firebase Storage bucket)
+        const uploadResult = await Promise.race([
+            uploadBytes(fileRef, file),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Storage upload timed out (15s). Ensure Firebase Storage is enabled in your project console and security rules allow writes.")), 15000))
+        ]) as any;
+
+        console.log("Firebase Storage: Upload complete. Fetching URL...");
+        const url = await getDownloadURL(uploadResult.ref);
+        console.log("Firebase Storage: URL fetched:", url);
+        return url;
     } catch (error) {
         console.error('Error uploading image: ', error);
         throw error;
