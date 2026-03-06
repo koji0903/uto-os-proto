@@ -64,8 +64,8 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
+            <div className="bg-uto-ivory rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300">
                 <div className="flex items-center justify-between p-4 border-b">
                     <h2 className="text-lg font-bold text-gray-800">新しいスポットを投稿</h2>
                     <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
@@ -78,18 +78,18 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">投稿タイプ (必須)</label>
-                        <div className="flex bg-gray-100 p-1 rounded-xl">
+                        <div className="flex bg-white/50 p-1 rounded-2xl shadow-inner">
                             <button
                                 type="button"
                                 onClick={() => setSpotType("resource")}
-                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${spotType === "resource" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                                className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${spotType === "resource" ? "bg-white text-uto-green shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
                             >
                                 地域資源（魅力・歴史など）
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setSpotType("issue")}
-                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${spotType === "issue" ? "bg-white text-red-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                                className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${spotType === "issue" ? "bg-white text-uto-coral shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
                             >
                                 地域課題（危険箇所など）
                             </button>
@@ -164,7 +164,7 @@ export default function SpotModal({ location, onClose, onSuccess }: SpotModalPro
                     <button
                         type="submit"
                         disabled={loadingStep !== null}
-                        className="mt-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-sm transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="mt-4 w-full bg-uto-green hover:bg-[#5A7D1C] text-white font-bold py-3.5 rounded-2xl shadow-md transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {loadingStep ? (
                             <>

@@ -14,7 +14,7 @@ export default function SpotCard({ spot, onClose, isAdmin, onDelete }: SpotCardP
 
     // 画面下部からせり上がるボトムシートスタイルのデザイン（モバイル時）
     return (
-        <div className="md:relative fixed bottom-0 left-0 right-0 z-40 bg-white rounded-t-3xl md:rounded-2xl shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.3)] md:shadow-xl overflow-hidden border-t md:border border-gray-100 flex flex-col w-full md:max-w-sm animate-in slide-in-from-bottom flex-shrink-0 pt-2 md:pt-0 pb-safe">
+        <div className="md:relative fixed bottom-0 left-0 right-0 z-40 bg-white rounded-t-[2rem] md:rounded-[2rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.3)] md:shadow-xl overflow-hidden border-t md:border border-gray-100 flex flex-col w-full md:max-w-sm animate-in slide-in-from-bottom flex-shrink-0 pt-2 md:pt-0 pb-safe">
             <div className="relative h-48 w-full bg-gray-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={spot.imageUrl} alt="Spot" className="object-cover w-full h-full" />
@@ -24,17 +24,17 @@ export default function SpotCard({ spot, onClose, isAdmin, onDelete }: SpotCardP
                 >
                     <X size={18} />
                 </button>
-                <div className="absolute top-2 left-2 flex gap-2">
+                <div className="absolute top-3 left-3 flex gap-2">
                     <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm backdrop-blur-md flex-shrink-0 ${isResource ? "bg-blue-500/90 text-white" : "bg-red-500/90 text-white"
+                        className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-sm backdrop-blur-md flex-shrink-0 ${isResource ? "bg-uto-green/90 text-white" : "bg-uto-coral/90 text-white"
                             }`}
                     >
                         {isResource ? "地域資源" : "地域課題"}
                     </span>
                     {!isResource && spot.urgency && (
                         <span
-                            className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm backdrop-blur-md flex-shrink-0 text-white ${spot.urgency === "high" ? "bg-red-600 animate-[pulse_1s_ease-in-out_infinite]" :
-                                    spot.urgency === "medium" ? "bg-orange-500/90" : "bg-emerald-500/90"
+                            className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-sm backdrop-blur-md flex-shrink-0 text-white ${spot.urgency === "high" ? "bg-[#DC2626] animate-[pulse_1s_ease-in-out_infinite] shadow-red-500/50" :
+                                spot.urgency === "medium" ? "bg-[#F97316]/90" : "bg-uto-green/90"
                                 }`}
                         >
                             緊急度: {spot.urgency === "high" ? "高" : spot.urgency === "medium" ? "中" : "低"}
@@ -65,8 +65,8 @@ export default function SpotCard({ spot, onClose, isAdmin, onDelete }: SpotCardP
                     </div>
                 </div>
 
-                <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4">
-                    <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm mb-2">
+                <div className="bg-uto-green/5 border border-uto-green/20 rounded-2xl p-4">
+                    <div className="flex items-center gap-2 text-uto-green font-bold text-sm mb-2">
                         <Sparkles size={16} />
                         AI 分析インサイト
                     </div>

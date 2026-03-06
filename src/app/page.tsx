@@ -124,22 +124,22 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-uto-ivory flex flex-col font-sans">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10 px-6 py-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-2 text-emerald-700">
-          <MapIcon size={24} className="text-emerald-600" />
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100/50 sticky top-0 z-10 px-6 py-4 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3 text-uto-gray">
+          <img src="/icons/logo.png" alt="Logo" className="w-9 h-9 object-contain" />
           <h1 className="text-xl font-bold tracking-tight">まちかどAIマップ宇土</h1>
         </div>
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex bg-gray-100 p-1 rounded-xl items-center shadow-inner">
+          <div className="hidden md:flex bg-gray-100/80 p-1.5 rounded-full items-center shadow-inner">
             <Layers size={16} className="text-gray-400 mx-2" />
             {(["all", "resource", "issue"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${filter === f
-                  ? "bg-white text-gray-800 shadow-sm"
+                className={`px-5 py-1.5 text-sm font-bold rounded-full transition-all ${filter === f
+                  ? "bg-white text-uto-gray shadow-sm"
                   : "text-gray-500 hover:text-gray-700"
                   }`}
               >
@@ -164,12 +164,12 @@ export default function Home() {
         {/* Left Side: Map */}
         <div className="flex-1 flex flex-col gap-4 relative">
           <div className="flex items-center justify-between">
-            <h2 className="text-gray-600 font-medium flex items-center gap-2">
-              <MapPin size={18} /> 地図をクリックして新しいスポットを登録
+            <h2 className="text-gray-600 font-bold flex items-center gap-2">
+              <MapPin size={18} className="text-uto-coral" /> 地図をクリックして新しいスポットを登録
             </h2>
             <button
               onClick={loadSpots}
-              className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition-colors"
+              className="p-2 text-gray-500 hover:text-uto-green hover:bg-uto-green/10 rounded-full transition-colors"
               title="データを更新"
             >
               <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
@@ -188,11 +188,11 @@ export default function Home() {
           <button
             id="gps-btn"
             onClick={handleGetLocation}
-            className="absolute bottom-6 right-6 md:bottom-8 md:right-8 bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all z-30 flex items-center justify-center group"
+            className="absolute bottom-6 right-6 md:bottom-8 md:right-8 bg-uto-coral hover:bg-[#E67348] text-white p-4 rounded-full shadow-lg hover:shadow-2xl transition-all z-30 flex items-center justify-center group"
             title="現在地を投稿する"
           >
             <MapPin size={28} className="group-hover:scale-110 transition-transform" />
-            <span className="absolute -top-10 right-0 bg-gray-800 text-white text-xs px-3 py-1.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <span className="absolute -top-10 right-0 bg-white text-uto-gray font-bold shadow-md text-xs px-3 py-1.5 rounded-full whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
               現在地を投稿
             </span>
           </button>
@@ -210,24 +210,24 @@ export default function Home() {
               />
             </div>
           ) : (
-            <div className="hidden md:flex bg-white/60 backdrop-blur-md rounded-2xl border border-gray-100 p-8 h-full flex-col items-center text-center shadow-sm justify-center pointer-events-auto">
+            <div className="hidden md:flex bg-white/60 backdrop-blur-md rounded-[2rem] border border-white p-8 h-full flex-col items-center text-center shadow-sm justify-center pointer-events-auto">
               {/* Desktop Dashboard Guide */}
-              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
+              <div className="w-16 h-16 bg-uto-ivory text-uto-green rounded-full flex items-center justify-center mb-6 shadow-sm border border-white">
                 <MapPin size={32} />
               </div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">スポットを探す</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="text-xl font-bold text-gray-800 mb-3">スポットを探す</h3>
+              <p className="text-sm font-medium text-gray-500 leading-relaxed">
                 地図上のピンをクリックすると、AIが分析した地域の魅力や課題の詳細が表示されます。
               </p>
-              <div className="mt-8 border-t border-gray-100 pt-6 w-full text-left">
-                <h4 className="text-sm font-bold text-gray-700 mb-3">色の見方</h4>
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="w-4 h-4 rounded-full bg-blue-500 shadow-sm border border-blue-600 flex-shrink-0"></span>
+              <div className="mt-8 border-t border-gray-200/50 pt-6 w-full text-left">
+                <h4 className="text-sm font-bold text-gray-700 mb-4 text-center">色の見方</h4>
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3 text-sm font-bold text-gray-600 bg-white/80 p-2.5 rounded-2xl shadow-sm">
+                    <img src="/icons/resource-pin.png" alt="Resource" className="w-6 h-6 object-contain" />
                     地域資源（魅力、歴史、グルメ）
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="w-4 h-4 rounded-full bg-red-500 shadow-sm border border-red-600 flex-shrink-0"></span>
+                  <div className="flex items-center gap-3 text-sm font-bold text-gray-600 bg-white/80 p-2.5 rounded-2xl shadow-sm">
+                    <img src="/icons/issue-pin.png" alt="Issue" className="w-6 h-6 object-contain" />
                     地域課題（危険箇所、インフラ異常）
                   </div>
                 </div>

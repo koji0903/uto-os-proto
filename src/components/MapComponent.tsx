@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo, useEffect } from "react";
-import { APIProvider, Map, AdvancedMarker, Pin, useMap } from "@vis.gl/react-google-maps";
+import { APIProvider, Map, AdvancedMarker, useMap } from "@vis.gl/react-google-maps";
 import { Spot } from "@/lib/db";
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
@@ -62,19 +62,18 @@ const MapComponent = memo(function MapComponent({ spots, filter, centerLocation,
                             className={spot.urgency === "high" ? "animate-[pulse_1s_ease-in-out_infinite]" : ""}
                         >
                             {spot.type === "resource" ? (
-                                // Blue pin for resources (natural/tourist spots)
-                                <Pin
-                                    background={"#3B82F6"}
-                                    borderColor={"#1D4ED8"}
-                                    glyphColor={"#FFFFFF"}
+                                // Green/Ivory pin for resources
+                                <img
+                                    src="/icons/resource-pin.png"
+                                    alt="Resource"
+                                    className="w-12 h-12 object-contain drop-shadow-md hover:scale-110 transition-transform"
                                 />
                             ) : (
-                                // Red pin for issues (danger/problems)
-                                <Pin
-                                    background={"#EF4444"}
-                                    borderColor={"#B91C1C"}
-                                    glyphColor={"#FFFFFF"}
-                                    scale={spot.urgency === "high" ? 1.3 : 1}
+                                // Coral pin for issues
+                                <img
+                                    src="/icons/issue-pin.png"
+                                    alt="Issue"
+                                    className={`w-12 h-12 object-contain drop-shadow-md hover:scale-110 transition-transform ${spot.urgency === "high" ? "scale-125 hover:scale-125" : ""}`}
                                 />
                             )}
                         </AdvancedMarker>
